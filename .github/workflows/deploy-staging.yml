@@ -1,0 +1,17 @@
+name: Deploy on Staging Merge/Push
+'on':
+  push:
+    branches:
+      - staging
+jobs:
+  build_and_preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to Firebase Staging URL
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          channelId: staging
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_CLOUDPONICS_BC383 }}'
+          projectId: cloudponics-bc383

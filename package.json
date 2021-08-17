@@ -1,0 +1,46 @@
+{
+  "name": "cloudponics",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.1.2",
+    "web-vitals": "^1.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "buildfunctions": "pushd functions > /dev/null && npm run build && popd > /dev/null",
+    "emulate": "npm run buildfunctions && firebase emulators:start --only firestore,functions,auth,storage",
+    "build": "npm install && react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "deploy": "if [ \"$(git rev-parse --abbrev-ref HEAD)\" == \"staging\" ]; then firebase hosting:channel:deploy staging --expires 30d; elif [ \"$(git rev-parse --abbrev-ref HEAD)\" == \"master\" ]; then firebase deploy; else echo Not on a valid deployment branch!; fi"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
