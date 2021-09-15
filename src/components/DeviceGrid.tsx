@@ -15,7 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { collection, query, where, onSnapshot, getFirestore } from '@firebase/firestore'
 
 // My Components, Types
-import DeviceCard, { DeviceCardProps as DeviceCardProps } from './SubscriptionItem';
+import DeviceCard, { DeviceCardProps } from './DeviceCard';
 import NewSubscription from './NewSubscription';
 import SuccessAlert from './SuccessAlert';
 

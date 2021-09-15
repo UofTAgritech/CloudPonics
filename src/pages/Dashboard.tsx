@@ -6,7 +6,7 @@ import { Theme } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 
-import DeviceGrid from '../components/SubscriptionGrid';
+import DeviceGrid from '../components/DeviceGrid';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

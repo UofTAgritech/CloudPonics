@@ -23,7 +23,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { collection, getDocs, getFirestore } from '@firebase/firestore';
 
 // My Components, Types
-import ProduceInput from './ProduceInput';
+import DeviceRegister from './DeviceRegister';
 
 // Styles
 const styles = (theme: Theme) => createStyles({
@@ -129,7 +129,7 @@ const SignupForm: FC<SignupProps> = (props: SignupProps) => {
                     <FormGroup>
                         {Object.entries(selection).map((option, index)=>{
                             return (
-                                <ProduceInput 
+                                <DeviceRegister 
                                     key={index} 
                                     option={option[0]} 
                                     label={option[1].option.name+': $'+option[1].option.price} 

@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 // Props
-interface ProduceInputProps {
+interface DeviceRegisterProps {
     label: string;
     option: string;
     quantity: number;
@@ -31,7 +31,7 @@ interface ProduceInputProps {
 }
 
 // Main Component
-const ProduceInput : FC<ProduceInputProps> = (props: ProduceInputProps) => {
+const DeviceRegister : FC<DeviceRegisterProps> = (props) => {
     const handleChange = (event: ChangeEvent<{ value: string }>, option: string) => {
         props.updateSelection(option, Math.min(Math.max(Number(event.target.value), 0), 20));
     };
@@ -53,4 +53,4 @@ const ProduceInput : FC<ProduceInputProps> = (props: ProduceInputProps) => {
     );
 };
     
-export default ProduceInput;
+export default DeviceRegister;
