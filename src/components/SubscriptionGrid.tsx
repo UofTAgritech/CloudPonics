@@ -15,7 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { collection, query, where, onSnapshot, getFirestore } from '@firebase/firestore'
 
 // My Components, Types
-import SubscriptionItem, { SubscriptionItemProps } from './SubscriptionItem';
+import DeviceCard, { DeviceCardProps as DeviceCardProps } from './SubscriptionItem';
 import NewSubscription from './NewSubscription';
 import SuccessAlert from './SuccessAlert';
 
@@ -36,24 +36,24 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 // Props
-export type SubscriptionGridProps = {
-    items?: SubscriptionItemProps[]
+export type DeviceGridProps = {
+    items?: DeviceCardProps[]
 };
 
 // Main Component
-const SubscriptionGrid : FC<SubscriptionGridProps> = (props) => {
+const DeviceGrid : FC<DeviceGridProps> = (props) => {
     const classes = useStyles();
     const user = useAuth();
     
     // Grid data state
     const [gridData, setGridData] = useState(props.items);
     useEffect(() => {
-        return onSnapshot(query(collection(getFirestore(), 'subscriptions'), where('owner', '==', user?.uid)), snapshot=>{
+        return onSnapshot(query(collection(getFirestore(), 'devices'), where('owner', '==', user?.uid)), snapshot=>{
             const data = snapshot.docs.map(doc=>{
                 return ({
                     item: doc.data(), 
                     docPath: doc.ref.path
-                } as SubscriptionItemProps);
+                } as DeviceCardProps);
             });
             setGridData(data);
         });
@@ -80,14 +80,14 @@ const SubscriptionGrid : FC<SubscriptionGridProps> = (props) => {
                     {gridData.length === 0 ? (
                         <Box className={classes.header}>
                             <Typography variant='h6'>
-                                No subscriptions found for {user?.displayName}!
+                                No devices found for {user?.displayName}!
                             </Typography>
                         </Box>
                     ) : (<></>)}
                     <Grid container spacing={3} className={classes.root}>
                         {gridData.map((item, index) => {
                             return (
-                                <SubscriptionItem 
+                                <DeviceCard 
                                     key={index} 
                                     item={item.item} 
                                     docPath={item.docPath} 
@@ -97,7 +97,7 @@ const SubscriptionGrid : FC<SubscriptionGridProps> = (props) => {
                         })}
                         <NewSubscription/>
                         <SuccessAlert openState={deleteAlert} onClose={handleDeleteAlertClose}>
-                            Subscription cancelled!
+                            Device deleted!
                         </SuccessAlert>
                     </Grid>
                 </>
@@ -106,4 +106,4 @@ const SubscriptionGrid : FC<SubscriptionGridProps> = (props) => {
     );
 };
             
-export default SubscriptionGrid;
+export default DeviceGrid;

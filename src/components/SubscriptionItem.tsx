@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export type SubscriptionItemProps = {
+export type DeviceCardProps = {
     item: {
         destination: string,
         source: string,
@@ -53,7 +53,7 @@ export type SubscriptionItemProps = {
     deleteAlert: ()=>void
 }
 
-const SubscriptionItem:FC<SubscriptionItemProps> = (props: SubscriptionItemProps) => {
+const DeviceCard:FC<DeviceCardProps> = (props) => {
     const classes = useStyles();
     
     // Delete confirmation dialog
@@ -119,4 +119,4 @@ const SubscriptionItem:FC<SubscriptionItemProps> = (props: SubscriptionItemProps
     );
 };
 
-export default SubscriptionItem;
+export default DeviceCard;
