@@ -1,17 +1,7 @@
 import { FC } from 'react';
-// import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-// import { getAuth, GoogleAuthProvider, FacebookAuthProvider, EmailAuthProvider } from 'firebase/auth'
-import { Box, Theme } from '@material-ui/core';
+import { signInWithRedirect, getAuth, GoogleAuthProvider } from 'firebase/auth'
+import { Box, Button, Theme } from '@material-ui/core';
 import { makeStyles, createStyles } from '@material-ui/styles';
-
-// const uiConfig: firebaseui.auth.Config = {
-//     signInFlow: 'redirect',
-//     signInOptions: [
-//         GoogleAuthProvider.PROVIDER_ID,
-//         FacebookAuthProvider.PROVIDER_ID,
-//         EmailAuthProvider.PROVIDER_ID
-//     ]
-// };
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,9 +17,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Auth:FC = () => {
     const classes = useStyles();
+    const google = new GoogleAuthProvider();
     return (
         <Box className={classes.root}>
-            {/* <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={getAuth()} /> */}
+            <Button variant="contained" onClick={()=>signInWithRedirect(getAuth(), google)}>
+                Sign In With Google
+            </Button>
         </Box>
     );
 };
