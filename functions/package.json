@@ -2,7 +2,7 @@
   "name": "functions",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
-    "build": "tsc",
+    "build": "rimraf lib/ && tsc",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
@@ -31,6 +31,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.25.2",
     "firebase-functions-test": "^0.2.3",
+    "rimraf": "^3.0.2",
     "typescript": "^3.9.10"
   },
   "private": true
