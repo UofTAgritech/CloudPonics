@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
-import { firestore } from 'firebase-admin';
+import {firestore} from 'firebase-admin';
 
-import { devices } from './devicelist';
+import {devices} from './devicelist';
 
 // Message Attributes:
 // - `deviceid`: ID of device as it appears in IoT registry AND Firestore document
@@ -24,24 +24,26 @@ export const dataPubSubListener = functions.pubsub.topic('data').onPublish((mess
   //   return;
   // }
 
-  if(!message.json || !message.json.metadata.owner || !message.json.metadata.project || !message.json.metadata.run){
+  if (!message.json || !message.json.metadata.owner || !message.json.metadata.project || !message.json.metadata.run) {
     functions.logger.error(`Device published incomplete message.`, message);
     return;
   }
 
-  if(!Object.keys(devices).includes(message.attributes.deviceId)){
+  if (!Object.keys(devices).includes(message.attributes.deviceId)) {
     functions.logger.error(`Unregistered device '${message.attributes.deviceId}' attempted to publish data.`);
     return;
   }
 
-  if(devices[message.attributes.deviceId].owner != message.json.metadata.owner){
-    functions.logger.error(`Decvice '${message.attributes.deviceId}' and owner '${message.json.metadata.owner}' do not match records.`);
+  if (devices[message.attributes.deviceId].owner != message.json.metadata.owner) {
+    functions.logger.error(`Decvice '${message.attributes.deviceId}' and`+
+      ` owner '${message.json.metadata.owner}' do not match records.`);
     return;
   }
 
-  let data = message.json.data as PubSubData;
+  const data = message.json.data as PubSubData;
 
-  return Object.keys(data).map(label=>
-    firestore().collection(`projects/${message.json.metadata.project}/runs/${message.json.metadata.run}/${label}/`).add(data[label])
+  return Object.keys(data).map((label)=>
+    firestore().collection(`projects/${message.json.metadata.project}/runs/${message.json.metadata.run}/${label}/`)
+        .add(data[label])
   );
-})
+});

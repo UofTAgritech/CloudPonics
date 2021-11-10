@@ -21,15 +21,15 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
   // - Auth state
   // - Data fields non-empty
   // - User quota not yet met
-  
+
   // Generate unique device identifier
   const deviceid = 'peapod-'+uuid();
-  
+
   const {privateKey, publicKey} = pki.rsa.generateKeyPair(4096);
-  
+
   // Build registry path
   const registryPath = iotClient.registryPath(gcpproject, cloudregion, registryid);
-  
+
   // Build IoT registry device creation request object
   const request : iot.protos.google.cloud.iot.v1.ICreateDeviceRequest = {
     parent: registryPath,
@@ -48,9 +48,9 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
       ],
     },
   };
-  
+
   // Create device
   const [response] = await iotClient.createDevice(request);
-  
+
   return {id: response.id, name: response.name, privateKey: pki.privateKeyToPem(privateKey)};
 });
