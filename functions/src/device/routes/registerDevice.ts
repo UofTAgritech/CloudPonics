@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 import * as iot from '@google-cloud/iot';
 import {v4 as uuid} from 'uuid';
 import {pki} from 'node-forge';
+import { firestore } from 'firebase-admin';
 
 // Found at https://console.cloud.google.com/iot/registries
 const gcpproject = 'cloudponics-bc383';
@@ -17,10 +18,12 @@ type DeviceRegistrationData = {
 }
 
 export const registerDevice = functions.https.onCall(async (data: DeviceRegistrationData, context) => {
-  // TODO: Check preconditions
-  // - Auth state
-  // - Data fields non-empty
-  // - User quota not yet met
+
+  if(!context.auth || !context.auth.uid){
+    throw new functions.https.HttpsError('permission-denied', 'Not authenticated.');
+  }
+
+  // TODO: user quota check
 
   // Generate unique device identifier
   const deviceid = 'peapod-'+uuid();
@@ -51,6 +54,10 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
 
   // Create device
   const [response] = await iotClient.createDevice(request);
+
+  await firestore().doc('devices/'+response.id).create({
+    owner: context.auth?.uid
+  })
 
   return {id: response.id, name: response.name, privateKey: pki.privateKeyToPem(privateKey)};
 });
