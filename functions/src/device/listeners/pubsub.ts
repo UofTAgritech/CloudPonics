@@ -24,19 +24,21 @@ export const dataPubSubListener = functions.pubsub.topic('data').onPublish((mess
   //   return;
   // }
 
+  // TODO: Send STOP command (or something like that) on fatal errors
+
   if (!message.json || !message.json.metadata.owner || !message.json.metadata.project || !message.json.metadata.run) {
     functions.logger.error(`Device published incomplete message.`, message);
     return;
   }
 
   if (!Object.keys(devices).includes(message.attributes.deviceId)) {
-    functions.logger.error(`Unregistered device '${message.attributes.deviceId}' attempted to publish data.`);
+    functions.logger.error(`Unregistered device '${message.attributes.deviceId}' attempted to publish data.`, devices);
     return;
   }
 
   if (devices[message.attributes.deviceId].owner != message.json.metadata.owner) {
     functions.logger.error(`Decvice '${message.attributes.deviceId}' and`+
-      ` owner '${message.json.metadata.owner}' do not match records.`);
+      ` owner '${message.json.metadata.owner}' do not match records.`, devices);
     return;
   }
 
