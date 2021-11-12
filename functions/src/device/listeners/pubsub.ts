@@ -16,7 +16,7 @@ type PubSubData = {
   }
 }
 
-export const dataPubSubListener = functions.pubsub.topic('data').onPublish((message)=>{
+export const dataPubSubListener = functions.pubsub.topic('data').onPublish(async (message)=>{
   // try {
   //   let temp = message.json;
   // } catch (e) {
@@ -44,8 +44,16 @@ export const dataPubSubListener = functions.pubsub.topic('data').onPublish((mess
 
   const data = message.json.data as PubSubData;
 
+  const rundoc = await firestore().doc(`projects/${message.json.metadata.project}/runs/${message.json.metadata.run}`).get();
+
+  if(!rundoc.exists){
+    rundoc.ref.create({
+      owner: message.json.metadata.owner,
+      device: message.attributes.deviceId
+    });
+  }
   return Object.keys(data).map((label)=>
-    firestore().collection(`projects/${message.json.metadata.project}/runs/${message.json.metadata.run}/${label}/`)
+    firestore().collection(`projects/${message.json.metadata.projectid}/runs/${message.json.metadata.runid}/${label}/`)
         .add(data[label])
   );
 });
