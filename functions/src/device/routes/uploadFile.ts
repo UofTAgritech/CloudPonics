@@ -9,7 +9,10 @@ type data = {
 }
 
 export const uploadFile = functions.https.onCall(async (data: data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'You are not authenticated');
+  }
   const storage = new Storage();
-  const bucket = storage.bucket(data.deviceName).file(data.filename);
+  const bucket = storage.bucket(`${context.auth.uid}/${data.deviceName}`).file(data.filename);
   bucket.save(data.file);
 });
