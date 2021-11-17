@@ -19,7 +19,7 @@ type DeviceRegistrationData = {
 
 export const registerDevice = functions.https.onCall(async (data: DeviceRegistrationData, context) => {
   if (!context.auth || !context.auth.uid) {
-    throw new functions.https.HttpsError('permission-denied', 'Not authenticated.');
+    throw new functions.https.HttpsError('unauthenticated', 'Not authenticated.');
   }
 
   // TODO: user quota check
