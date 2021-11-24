@@ -16,7 +16,6 @@ import { collection, query, where, onSnapshot, getFirestore } from '@firebase/fi
 
 // My Components, Types
 import DeviceCard, { DeviceCardProps } from './DeviceCard';
-import NewSubscription from './NewSubscription';
 import SuccessAlert from './SuccessAlert';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -51,8 +50,8 @@ const DeviceGrid : FC<DeviceGridProps> = (props) => {
         return onSnapshot(query(collection(getFirestore(), 'devices'), where('owner', '==', user?.uid)), snapshot=>{
             const data = snapshot.docs.map(doc=>{
                 return ({
-                    item: doc.data(), 
-                    docPath: doc.ref.path
+                    device: doc.data(), 
+                    docRef: doc.ref
                 } as DeviceCardProps);
             });
             setGridData(data);
@@ -80,7 +79,7 @@ const DeviceGrid : FC<DeviceGridProps> = (props) => {
                     {gridData.length === 0 ? (
                         <Box className={classes.header}>
                             <Typography variant='h6'>
-                                No devices found for {user?.displayName}!
+                                No devices found for {user?.displayName ?? user?.email}!
                             </Typography>
                         </Box>
                     ) : (<></>)}
@@ -88,14 +87,13 @@ const DeviceGrid : FC<DeviceGridProps> = (props) => {
                         {gridData.map((item, index) => {
                             return (
                                 <DeviceCard 
-                                    key={index} 
-                                    item={item.item} 
-                                    docPath={item.docPath} 
+                                    key={'devicecard-'+index} 
+                                    {...item}
                                     deleteAlert={handleDeleteAlertOpen}
+                                    deleteDevice={()=>{}}
                                 />
                             );
                         })}
-                        <NewSubscription/>
                         <SuccessAlert openState={deleteAlert} onClose={handleDeleteAlertClose}>
                             Device deleted!
                         </SuccessAlert>

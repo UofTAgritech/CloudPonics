@@ -34,7 +34,7 @@ const Dashboard:FC = () => {
         <div>
             <Box className={classes.header} >
                 <Typography variant='h4'>
-                    Manage Devices
+                    Device Dashboard
                 </Typography>
             </Box>
             <Box className={classes.grid}>
