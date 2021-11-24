@@ -14,7 +14,7 @@ const registryid = 'CloudPonics';
 const iotClient = new iot.DeviceManagerClient();
 
 type DeviceRegistrationData = {
-  // Nothing yet
+  name?: string
 }
 
 export const registerDevice = functions.https.onCall(async (data: DeviceRegistrationData, context) => {
@@ -60,6 +60,7 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
 
   await firestore().doc('devices/'+response.id).create({
     owner: context.auth?.uid,
+    name: data.name ?? 'PeaPod'
   });
 
   return {id: response.id, name: response.name, privateKey: pki.privateKeyToPem(privateKey)};
