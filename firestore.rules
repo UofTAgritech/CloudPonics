@@ -19,7 +19,8 @@ service cloud.firestore {
       allow write: if false; //Cloud Functions only
     }
     match /devices/{deviceId=**} {
-      allow read, write: if false; //Cloud Functions only
+      allow read: if resource.data.owner == request.auth.uid;
+      allow write: if false; //Cloud Functions only
     }
   }
 }
