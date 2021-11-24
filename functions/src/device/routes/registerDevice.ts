@@ -24,7 +24,7 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
 
   const userdoc = await firestore().doc(`users/${context.auth.uid}`).get();
 
-  if (userdoc.get('devicecount') >= userdoc.get('devicequota')){
+  if (userdoc.get('devicecount') >= userdoc.get('devicequota')) {
     throw new functions.https.HttpsError('resource-exhausted', 'Device quota exceeded.');
   }
 
@@ -81,14 +81,14 @@ export const unregisterDevice = functions.https.onCall(async (data: DeviceUnregi
     throw new functions.https.HttpsError('invalid-argument', 'Device does not exist');
   }
 
-  if(devicedoc.get('owner') != context.auth.uid){
+  if (devicedoc.get('owner') != context.auth.uid) {
     throw new functions.https.HttpsError('permission-denied', 'Permission denied');
   }
 
   await iotClient.deleteDevice({name: iotClient.devicePath(
-    gcpproject,
-    cloudregion,
-    registryid,
-    data.deviceid
+      gcpproject,
+      cloudregion,
+      registryid,
+      data.deviceid
   )});
 });

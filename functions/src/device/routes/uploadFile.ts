@@ -16,14 +16,14 @@ export const uploadFile = functions.https.onCall(async (data: data, context) => 
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'You are not authenticated');
   }
-  
+
   const bucket = storage.bucket(`projects/${data.project}/runs/${data.run}`).file(data.filename);
-  
+
   return Promise.all([
     bucket.setMetadata({
       owner: context.auth.uid,
-      deviceId: data.deviceId
+      deviceId: data.deviceId,
     }),
-    bucket.save(data.file)
+    bucket.save(data.file),
   ]);
 });
