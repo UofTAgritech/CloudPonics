@@ -63,6 +63,10 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
     name: data.name ?? 'PeaPod'
   });
 
+  await firestore().doc('users/'+context.auth.uid).update({
+    devicecount: firestore.FieldValue.increment(1)
+  });
+
   return {id: response.id, name: response.name, privateKey: pki.privateKeyToPem(privateKey)};
 });
 
