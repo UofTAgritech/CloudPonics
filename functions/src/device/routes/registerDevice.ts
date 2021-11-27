@@ -96,4 +96,6 @@ export const unregisterDevice = functions.https.onCall(async (data: DeviceUnregi
       registryid,
       data.deviceid
   )});
+
+  await devicedoc.ref.delete();
 });
