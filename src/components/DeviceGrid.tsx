@@ -17,6 +17,7 @@ import { collection, query, where, onSnapshot, getFirestore } from '@firebase/fi
 // My Components, Types
 import DeviceCard, { DeviceCardProps } from './DeviceCard';
 import SuccessAlert from './SuccessAlert';
+import {getFunctions, httpsCallable} from 'firebase/functions';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -43,6 +44,7 @@ export type DeviceGridProps = {
 const DeviceGrid : FC<DeviceGridProps> = (props) => {
     const classes = useStyles();
     const user = useAuth();
+    const deleteDevice = httpsCallable<{deviceid: string}, void>(getFunctions(), 'unregisterDevice');
     
     // Grid data state
     const [gridData, setGridData] = useState(props.items);
@@ -89,8 +91,7 @@ const DeviceGrid : FC<DeviceGridProps> = (props) => {
                                 <DeviceCard 
                                     key={'devicecard-'+index} 
                                     {...item}
-                                    deleteAlert={handleDeleteAlertOpen}
-                                    deleteDevice={()=>{}}
+                                    deleteDevice={()=>{deleteDevice({deviceid: item.docRef.id}).then(handleDeleteAlertOpen)}}
                                 />
                             );
                         })}

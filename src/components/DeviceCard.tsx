@@ -1,5 +1,6 @@
 // React engine
 import { useState, FC } from 'react';
+import { useHistory } from 'react-router-dom';
 
 // MUI core
 import Typography from '@material-ui/core/Typography';
@@ -38,15 +39,20 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export type DeviceCardProps = {
   device: {
-    owner: string
+    owner: string,
+    name: string
   },
   docRef: DocumentReference,
-  deleteAlert: ()=>void,
   deleteDevice: ()=>void
 }
 
 const DeviceCard:FC<DeviceCardProps> = (props) => {
   const classes = useStyles();
+  let history = useHistory();
+
+  const gotoDevice = () => {
+    history.push(`/devices/${props.docRef.id}`)
+  }
   
   // Delete confirmation dialog
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -58,7 +64,6 @@ const DeviceCard:FC<DeviceCardProps> = (props) => {
   };
   const handleCancelAndClose = () => {
     handleDeleteClose();
-    props.deleteAlert();
     props.deleteDevice();
   };
   
@@ -66,20 +71,20 @@ const DeviceCard:FC<DeviceCardProps> = (props) => {
     <GridCard>
       <Typography variant='h6' className={classes.title}>
         <Box className={classes.titlebox}>
-          {props.docRef.id}
+          {props.device.name}
         </Box>
       </Typography>
       <Box className={classes.textbox}>
         <Typography variant='body2'>
-          PeaPod
+          {props.docRef.id}
         </Typography>
       </Box>
       <Box className={classes.buttonbox}>
-        <Button variant='contained' color='primary' onClick={()=>{return;}}>
+        <Button variant='contained' color='primary' onClick={gotoDevice}>
           View
         </Button>
         <Button variant='contained' color='secondary' onClick={handleDeleteOpen}>
-        Delete
+          Delete
         </Button>
       </Box>
       <Dialog
