@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 
 import {Storage} from '@google-cloud/storage';
 
-type data = {
+type FileUploadData = {
   deviceId: string,
   filename: string,
   project: string,
@@ -12,18 +12,11 @@ type data = {
 
 const storage = new Storage();
 
-export const uploadFile = functions.https.onCall(async (data: data, context) => {
+export const uploadFile = functions.https.onCall(async (data: FileUploadData, context) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'You are not authenticated');
+    throw new functions.https.HttpsError('unauthenticated', 'Not authenticated.');
   }
 
   const bucket = storage.bucket(`projects/${data.project}/runs/${data.run}`).file(data.filename);
-
-  return Promise.all([
-    bucket.setMetadata({
-      owner: context.auth.uid,
-      deviceId: data.deviceId,
-    }),
-    bucket.save(data.file),
-  ]);
+  return bucket.save(data.file);
 });
