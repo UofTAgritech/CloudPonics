@@ -40,7 +40,11 @@ const useStyles = makeStyles((theme: Theme) =>
 export type DeviceCardProps = {
   device: {
     owner: string,
-    name: string
+    name: string,
+    latest: {
+      project: string,
+      run: string,
+    },
   },
   docRef: DocumentReference,
   deleteDevice: ()=>void
@@ -77,6 +81,9 @@ const DeviceCard:FC<DeviceCardProps> = (props) => {
       <Box className={classes.textbox}>
         <Typography variant='body2'>
           {props.docRef.id}
+        </Typography>
+        <Typography variant='body2'>
+          Project: {props.device.latest.project}
         </Typography>
       </Box>
       <Box className={classes.buttonbox}>

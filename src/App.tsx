@@ -92,7 +92,9 @@ const AuthLoader:FC = ({children}) => {
                         return (<Device {...params.match.params}/>);
                       }}/>
                       {/* Default */}
-                      <Redirect to='/dashboard'/>
+                      <Route path='/'>
+                        <Redirect to='/dashboard'/>
+                      </Route>
                     </>
                   ) : <Redirect to='/login'/>}
                 </Switch>
