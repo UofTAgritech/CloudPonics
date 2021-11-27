@@ -98,4 +98,8 @@ export const unregisterDevice = functions.https.onCall(async (data: DeviceUnregi
   )});
 
   await devicedoc.ref.delete();
+
+  await firestore().doc('users/'+context.auth.uid).update({
+    devicecount: firestore.FieldValue.increment(-1),
+  });
 });
