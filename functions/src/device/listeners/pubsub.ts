@@ -47,12 +47,25 @@ export const dataPubSubListener = functions.pubsub.topic('data').onPublish(async
   const rundoc = await firestore().doc(`projects/${message.json.metadata.project}/runs/${message.json.metadata.run}`)
       .get();
 
+  // Create run document
   if (!rundoc.exists) {
     rundoc.ref.create({
       owner: message.json.metadata.owner,
       device: message.attributes.deviceId,
     });
   }
+
+  // New project?
+  if (devices[message.attributes.deviceId].latest.project != message.json.metadata.project ||
+    devices[message.attributes.deviceId].latest.run != message.json.metadata.run) {
+    await firestore().doc(`devices/${message.attributes.deviceId}`).update({
+      latest: {
+        project: message.json.metadata.project,
+        run: message.json.metadata.run,
+      },
+    });
+  }
+
   return Object.keys(data).map((label)=>
     firestore().collection(`projects/${message.json.metadata.projectid}/runs/${message.json.metadata.runid}/${label}/`)
         .add(data[label])
