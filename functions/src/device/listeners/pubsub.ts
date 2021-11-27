@@ -71,5 +71,5 @@ export const dataPubSubListener = functions.pubsub.topic('data').onPublish(async
   return Object.keys(data).map((label)=>
     firestore()
         .collection(`projects/${metadata.project}/runs/${metadata.run}/${label}/`)
-        .add(data[label]));
+        .add({...data[label], timestamp: firestore.FieldValue.serverTimestamp()}));
 });
