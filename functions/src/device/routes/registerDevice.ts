@@ -14,15 +14,19 @@ const registryid = 'CloudPonics';
 const iotClient = new iot.DeviceManagerClient();
 
 type DeviceRegistrationData = {
-  // Nothing yet
-}
+  name: string
+} | null;
 
 export const registerDevice = functions.https.onCall(async (data: DeviceRegistrationData, context) => {
   if (!context.auth || !context.auth.uid) {
     throw new functions.https.HttpsError('unauthenticated', 'Not authenticated.');
   }
 
-  // TODO: user quota check
+  const userdoc = await firestore().doc(`users/${context.auth.uid}`).get();
+
+  if (userdoc.get('devicecount') >= userdoc.get('devicequota')) {
+    throw new functions.https.HttpsError('resource-exhausted', 'Device quota exceeded.');
+  }
 
   // Generate unique device identifier
   const deviceid = 'peapod-'+uuid();
@@ -56,7 +60,42 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
 
   await firestore().doc('devices/'+response.id).create({
     owner: context.auth?.uid,
+    name: data?.name ?? 'PeaPod',
+  });
+
+  await firestore().doc('users/'+context.auth.uid).update({
+    devicecount: firestore.FieldValue.increment(1),
   });
 
   return {id: response.id, name: response.name, privateKey: pki.privateKeyToPem(privateKey)};
+});
+
+type DeviceUnregistrationData = {
+  deviceid: string
+}
+
+
+export const unregisterDevice = functions.https.onCall(async (data: DeviceUnregistrationData, context) => {
+  if (!context.auth || !context.auth.uid) {
+    throw new functions.https.HttpsError('unauthenticated', 'Not authenticated.');
+  }
+
+  const devicedoc = await firestore().doc(`devices/${data.deviceid}`).get();
+
+  if (!devicedoc.exists) {
+    throw new functions.https.HttpsError('invalid-argument', 'Device does not exist');
+  }
+
+  if (devicedoc.get('owner') != context.auth.uid) {
+    throw new functions.https.HttpsError('permission-denied', 'Permission denied');
+  }
+
+  await iotClient.deleteDevice({name: iotClient.devicePath(
+      gcpproject,
+      cloudregion,
+      registryid,
+      data.deviceid
+  )});
+
+  await devicedoc.ref.delete();
 });
