@@ -44,12 +44,13 @@ export const dataPubSubListener = functions.pubsub.topic('data').onPublish(async
 
   const data = message.json.data as PubSubData;
 
-  const rundoc = await firestore().doc(`projects/${message.json.metadata.project}/runs/${message.json.metadata.run}`).get();
+  const rundoc = await firestore().doc(`projects/${message.json.metadata.project}/runs/${message.json.metadata.run}`)
+      .get();
 
-  if(!rundoc.exists){
+  if (!rundoc.exists) {
     rundoc.ref.create({
       owner: message.json.metadata.owner,
-      device: message.attributes.deviceId
+      device: message.attributes.deviceId,
     });
   }
   return Object.keys(data).map((label)=>
