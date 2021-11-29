@@ -52,11 +52,13 @@ const DeviceGrid : FC = () => {
         } as DeviceCardProps);
       });
       setGridData(data);
+      setDevicesFetched(true);
     });
   }, [user]);
   
   // Delete success snackbar
   const [deleteAlert, setDeleteAlert] = useState(false);
+  const [devicesFetched, setDevicesFetched] = useState(false);
   const handleDeleteAlertOpen = () => {
     setDeleteAlert(true);
   };
@@ -68,7 +70,7 @@ const DeviceGrid : FC = () => {
   };
   
   return (
-    <Loading loading={gridData.length === 0}>
+    <Loading loading={!devicesFetched}>
       {gridData.length === 0 ? (
         <Box className={classes.header}>
           <Typography variant='h6'>
