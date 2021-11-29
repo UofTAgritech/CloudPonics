@@ -7,7 +7,7 @@ import {useAuth} from './contexts/AuthContext';
 
 // Components
 import NavBar from './components/NavBar';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Loading from './components/Loading';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -51,57 +51,35 @@ const theme = createTheme({
   }
 });
 
-const AuthLoader:FC = ({children}) => {
+const App:FC = () => {
   return (
-    <>
-    {useAuth() === undefined ? 
-      (
-        <div style={{
-          display: 'flex', 
-          justifyContent: 'center', 
-          marginTop: '2%'
-        }}>
-        <CircularProgress/>
-        </div>
-        ) : (
-          <>
-          {children}
-          </>
-          )
-        }
-        </>
-        );
-      };
-      
-      const App:FC = () => {
-        return (
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Router>
-              <NavBar />
-              <AuthLoader>
-                <Switch>
-                  <Route path='/login'>
-                    {useAuth() ? <Redirect to='/dashboard'/> : <Auth/> }
-                  </Route>
-                  {/* Pages with auth precondition */}
-                  {useAuth() ? (
-                    <>
-                      <Route exact path='/dashboard' component={Dashboard}/>
-                      <Route exact path='/devices/:deviceid' render={(params)=>{
-                        return (<Device {...params.match.params}/>);
-                      }}/>
-                      {/* Default */}
-                      <Route path='/'>
-                        <Redirect to='/dashboard'/>
-                      </Route>
-                    </>
-                  ) : <Redirect to='/login'/>}
-                </Switch>
-              </AuthLoader>
-            </Router>
-          </ThemeProvider>
-          );
-        };
-        
-        export default App;
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <NavBar />
+        <Loading loading={useAuth() === undefined}>
+          <Switch>
+            <Route path='/login'>
+              {useAuth() ? <Redirect to='/dashboard'/> : <Auth/>}
+            </Route>
+            {/* Pages with auth precondition */}
+            {useAuth() ? (
+              <>
+                <Route exact path='/dashboard' component={Dashboard}/>
+                <Route exact path='/devices/:deviceid' render={(params)=>{
+                  return (<Device {...params.match.params}/>);
+                }}/>
+                {/* Default */}
+                <Route path='/'>
+                  <Redirect to='/dashboard'/>
+                </Route>
+              </>
+            ) : <Redirect to='/login'/>}
+          </Switch>
+        </Loading>
+      </Router>
+    </ThemeProvider>
+  );
+};
+
+export default App;
