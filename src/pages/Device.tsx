@@ -1,10 +1,13 @@
 import React, {FC, useEffect, useState} from 'react'
 import {getFunctions, httpsCallable} from 'firebase/functions';
 import {getFirestore, doc, getDoc, onSnapshot, collection, query, orderBy, limit, QuerySnapshot, DocumentData} from 'firebase/firestore';
-import {LineChart, XAxis, YAxis, Tooltip, CartesianGrid, Line} from 'recharts';
+import {Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip, Legend} from 'chart.js';
+import { Scatter } from 'react-chartjs-2';
 import moment from 'moment';
-import { Typography } from '@material-ui/core';
 import Loading from '../components/Loading';
+
+ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
+
 
 type DevicePageProps = {
   deviceid: string
@@ -36,6 +39,8 @@ const Device:FC<DevicePageProps> = (props) => {
   }>({});
 
   const formatTimestamps = (tick: number) => moment(tick).format('LTS');
+
+  const datasetToTitle = (dataset: string) => dataset.split('-').map(word=>(word.charAt(0).toUpperCase()+word.substring(1))).join(' ');
 
   // Setup
   useEffect(() => {
@@ -86,24 +91,26 @@ const Device:FC<DevicePageProps> = (props) => {
   return (
     <Loading loading={Object.entries(data).length === 0}>
       {Object.entries(data).map((dataset)=>(
-        <>
-          <Typography>
-            {dataset[0]}
-          </Typography>
-          <LineChart
-            key={'chart-'+dataset[0]}
-            width={1000}
-            height={400}
-            data={dataset[1]}
-            margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
-          >
-            <XAxis dataKey="x" tickFormatter={formatTimestamps}/>
-            <YAxis/>
-            <Tooltip />
-            <CartesianGrid stroke="#f5f5f5" />
-            <Line type="monotone" dataKey="y" stroke="#ff7300" yAxisId={0} />
-          </LineChart>
-        </>
+        <Scatter key={'chart-'+dataset[0]} options={{
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top' as const,
+            },
+            // title: {
+            //   display: true,
+            //   text: datasetToTitle(dataset[0]),
+            // },
+          },
+        }} data={{
+          datasets: [
+            {
+              label: datasetToTitle(dataset[0]),
+              data: dataset[1],
+              showLine: true,
+            }
+          ]
+        }} />
       ))}
     </Loading>
   )
