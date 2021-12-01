@@ -99,7 +99,8 @@ const Device:FC<DevicePageProps> = (props) => {
             x: {
               ticks: {
                 callback: (value)=>formatTimestamps(value as number)
-              }
+              },
+              min: dataset[1][0].x,
             }
           },
           plugins: {
