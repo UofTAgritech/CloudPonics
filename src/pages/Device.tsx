@@ -55,16 +55,18 @@ const Device:FC<DevicePageProps> = (props) => {
     });
   }, [])
 
-  const updateDataFromQuerySnapshot = (dataset: string, snapshot: QuerySnapshot<DocumentData>) => {
+  const updateDataFromQuerySnapshot = (dataset: string, snapshot: QuerySnapshot<DocumentData>, limit: number = 50) => {
     let newdata: {x: number, y: number}[] = [];
-    snapshot.docs.forEach(doc=>{
-      newdata = newdata.concat((doc.data() as PubSubData).batch.map(datum=>{
-        return {x: datum.timestamp, y: datum.value};
-      }));
-    })
+    snapshot.docChanges().forEach((change) => {
+      if (change.type === "added") {
+        newdata = newdata.concat((change.doc.data() as PubSubData).batch.map(datum=>{
+          return {x: datum.timestamp, y: datum.value};
+        }));
+      }
+    });
     newdata.sort((a, b)=>{
       return a.x-b.x;
-    })
+    }).slice(-limit);
     setData((old)=>{
       console.log(old);
       return ({...old, [dataset]: (old[dataset] ?? []).concat(newdata).slice(-limit)})
@@ -93,6 +95,13 @@ const Device:FC<DevicePageProps> = (props) => {
       {Object.entries(data).map((dataset)=>(
         <Scatter key={'chart-'+dataset[0]} options={{
           responsive: true,
+          scales: {
+            x: {
+              ticks: {
+                callback: (value)=>formatTimestamps(value as number)
+              }
+            }
+          },
           plugins: {
             legend: {
               position: 'top' as const,
