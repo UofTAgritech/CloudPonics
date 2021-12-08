@@ -5,13 +5,7 @@ import {v4 as uuid} from 'uuid';
 import {pki} from 'node-forge';
 import {firestore} from 'firebase-admin';
 
-// Found at https://console.cloud.google.com/iot/registries
-const gcpproject = 'cloudponics-bc383';
-const cloudregion = 'us-central1';
-const registryid = 'CloudPonics';
-
-// Client SDKs
-const iotClient = new iot.DeviceManagerClient();
+import * as IoT from '../../lib/IoTClient';
 
 type DeviceRegistrationData = {
   name: string
@@ -33,12 +27,9 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
 
   const {privateKey, publicKey} = pki.rsa.generateKeyPair(4096);
 
-  // Build registry path
-  const registryPath = iotClient.registryPath(gcpproject, cloudregion, registryid);
-
   // Build IoT registry device creation request object
   const request : iot.protos.google.cloud.iot.v1.ICreateDeviceRequest = {
-    parent: registryPath,
+    parent: IoT.registryPath,
     device: {
       id: deviceid,
       metadata: {
@@ -56,7 +47,7 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
   };
 
   // Create device
-  const [response] = await iotClient.createDevice(request);
+  const [response] = await IoT.IoTClient.createDevice(request);
 
   await firestore().doc('devices/'+response.id).create({
     owner: context.auth?.uid,
@@ -90,10 +81,10 @@ export const unregisterDevice = functions.https.onCall(async (data: DeviceUnregi
     throw new functions.https.HttpsError('permission-denied', 'Permission denied');
   }
 
-  await iotClient.deleteDevice({name: iotClient.devicePath(
-      gcpproject,
-      cloudregion,
-      registryid,
+  await IoT.IoTClient.deleteDevice({name: IoT.IoTClient.devicePath(
+      IoT.gcpproject,
+      IoT.cloudregion,
+      IoT.registryid,
       data.deviceid
   )});
 
