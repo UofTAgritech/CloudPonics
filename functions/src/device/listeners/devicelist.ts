@@ -4,7 +4,12 @@ import {firestore} from 'firebase-admin';
 // Minimize Firestore reads by caching device IDs and metadata.
 
 type DeviceData = {
-  owner: string
+  owner: string,
+  name: string,
+  latest: {
+    project: string,
+    run: string,
+  },
 }
 
 export const devices: {[key: string]: DeviceData} = {};

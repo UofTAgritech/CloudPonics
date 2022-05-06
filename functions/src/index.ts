@@ -5,3 +5,4 @@ export {deviceCreationListener, deviceDeletionListener} from './device/listeners
 export * from './device/listeners/pubsub';
 export * from './device/routes/registerDevice';
 export * from './webapp/listeners/auth';
+export * from './webapp/routes/routes';

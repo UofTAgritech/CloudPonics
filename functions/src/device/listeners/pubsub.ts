@@ -26,7 +26,10 @@ export const dataPubSubListener = functions.pubsub.topic('data').onPublish(async
 
   // TODO: Send STOP command (or something like that) on fatal errors
 
-  if (!message.json || !message.json.metadata.owner || !message.json.metadata.project || !message.json.metadata.run) {
+  const data = message.json.data as PubSubData;
+  const metadata = message.json.metadata as {project: string, run: string, owner: string};
+
+  if (!message.json || !metadata.owner || !metadata.project || !metadata.run) {
     functions.logger.error(`Device published incomplete message.`, message);
     return;
   }
@@ -36,25 +39,37 @@ export const dataPubSubListener = functions.pubsub.topic('data').onPublish(async
     return;
   }
 
-  if (devices[message.attributes.deviceId].owner != message.json.metadata.owner) {
+  if (devices[message.attributes.deviceId].owner != metadata.owner) {
     functions.logger.error(`Decvice '${message.attributes.deviceId}' and`+
-      ` owner '${message.json.metadata.owner}' do not match records.`, devices);
+      ` owner '${metadata.owner}' do not match records.`, devices);
     return;
   }
 
-  const data = message.json.data as PubSubData;
 
-  const rundoc = await firestore().doc(`projects/${message.json.metadata.project}/runs/${message.json.metadata.run}`)
+  const rundoc = await firestore().doc(`projects/${metadata.project}/runs/${metadata.run}`)
       .get();
 
+  // Create run document
   if (!rundoc.exists) {
     rundoc.ref.create({
-      owner: message.json.metadata.owner,
+      owner: metadata.owner,
       device: message.attributes.deviceId,
     });
   }
+
+  // New project?
+  if (devices[message.attributes.deviceId].latest.project != metadata.project ||
+    devices[message.attributes.deviceId].latest.run != metadata.run) {
+    await firestore().doc(`devices/${message.attributes.deviceId}`).update({
+      latest: {
+        project: metadata.project,
+        run: metadata.run,
+      },
+    });
+  }
+
   return Object.keys(data).map((label)=>
-    firestore().collection(`projects/${message.json.metadata.projectid}/runs/${message.json.metadata.runid}/${label}/`)
-        .add(data[label])
-  );
+    firestore()
+        .collection(`projects/${metadata.project}/runs/${metadata.run}/${label}/`)
+        .add({...data[label], timestamp: firestore.FieldValue.serverTimestamp()}));
 });

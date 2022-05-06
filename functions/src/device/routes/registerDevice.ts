@@ -42,7 +42,7 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
     device: {
       id: deviceid,
       metadata: {
-        owner: context.auth?.uid ?? 'none',
+        owner: context.auth?.uid,
       },
       credentials: [
         {
@@ -61,6 +61,10 @@ export const registerDevice = functions.https.onCall(async (data: DeviceRegistra
   await firestore().doc('devices/'+response.id).create({
     owner: context.auth?.uid,
     name: data?.name ?? 'PeaPod',
+    latest: {
+      project: '',
+      run: '',
+    },
   });
 
   await firestore().doc('users/'+context.auth.uid).update({
